@@ -1,0 +1,2 @@
+remote: remote.it
+auro .sh: .desktop
