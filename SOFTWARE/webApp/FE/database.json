@@ -1,0 +1,25 @@
+{
+  "dashboards": [
+    {
+      "id": 1,
+      "name": "dashboard 1",
+      "devices": ["device1", "device2", "device3", "device4"]
+    },
+    {
+      "id": 2,
+      "name": "dashboard 2",
+      "devices": ["device5"]
+    },
+    {
+      "id": 3,
+      "name": "dashboard 3",
+      "devices": ["device6"]
+    },
+    {
+      "id": 4,
+      "name": "dashboard 4",
+      "devices": ["device7"]
+    }
+  ]
+  
+}
