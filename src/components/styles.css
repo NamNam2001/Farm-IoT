@@ -1,0 +1,44 @@
+.container-chart{
+    display: inline-block;
+    position: relative;
+    width: 50%;
+    padding: 10px ;
+    border: 1px solid #ccc; /* Đường bo màu xám với độ dày là 1px */
+    border-radius: 20px; /* Kích thước bo tròn */
+}
+.rs-input-group.rs-input-group-inside{
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0; 
+    margin: auto;
+    width: 50%;
+    z-index: 9;
+}
+
+/* .rs-picker{
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0; 
+    margin: auto;
+    width: 100%;
+    z-index: 999;
+} */
+.value{
+    display: inline;
+    font-size: 13px;
+    top: 20%;
+    right: 2%;
+    z-index: 999;
+    position: absolute;
+}
+
+
+/* #large-area-chart {
+    width: 150%;
+    height: 350%;
+} */
+/* .rs-input-group.rs-input-group-inside .rs-input {
+    display: none;
+} */
