@@ -1,7 +1,0 @@
-# Bỏ qua tất cả các file và thư mục
-*
-
-# Ngoại trừ các file cụ thể trong thư mục con
-!/server.py
-!/requirements.txt
-!/.gitignore
