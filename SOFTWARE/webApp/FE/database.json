@@ -1,25 +1,103 @@
 {
   "dashboards": [
     {
-      "id": 1,
-      "name": "dashboard 1",
-      "devices": ["device1", "device2", "device3", "device4"]
+      "name": "dashboard2",
+      "devices": [
+        "device5",
+        "hfahodhgi",
+        "66c6a5efd9ce9d9c62025010",
+        "66c6a5efd9ce9d9c62025013",
+        "66c6a5efd9ce9d9c62025014"
+      ],
+      "id": 2
     },
     {
-      "id": 2,
-      "name": "dashboard 2",
-      "devices": ["device5"]
+      "name": "Ao-test",
+      "devices": [
+        "device1",
+        "device2",
+        "device4",
+        "66c6a5efd9ce9d9c62025013",
+        "66c6a5efd9ce9d9c62025016",
+        "66c6a5efd9ce9d9c62025015",
+        "66c6a5efd9ce9d9c62025014"
+      ],
+      "id": "3"
     },
     {
-      "id": 3,
-      "name": "dashboard 3",
-      "devices": ["device6"]
+      "id": "4",
+      "name": "Ao_L1",
+      "devices": [
+        "device1",
+        "device3",
+        "device7",
+        "device6"
+      ]
     },
     {
-      "id": 4,
-      "name": "dashboard 4",
-      "devices": ["device7"]
+      "name": "Ao-test1",
+      "devices": [
+        "deviceB",
+        "device8",
+        "device6",
+        "pH_m3",
+        "hello",
+        "hfahodhgi"
+      ],
+      "id": "YG7_Uv7"
+    },
+    {
+      "name": "deviceC",
+      "devices": [
+        "66c6a5efd9ce9d9c62025014",
+        "66c6a5efd9ce9d9c62025013",
+        "66c6a5efd9ce9d9c62025016",
+        "66c6a5efd9ce9d9c62025018"
+      ],
+      "id": "oH4IuLk"
+    },
+    {
+      "name": "hello",
+      "devices": [
+        "66c6a5efd9ce9d9c62025013",
+        "66c6a5efd9ce9d9c62025014",
+        "66c6a5efd9ce9d9c62025016"
+      ],
+      "id": "PyciOOf"
+    }
+  ],
+  "devices": [
+    {
+      "name": "deviceAB",
+      "id": "66c6a5efd9ce9d9c62025010"
+    },
+    {
+      "id": "66c6a5efd9ce9d9c62025013",
+      "name": "device4"
+    },
+    {
+      "id": "66c6a5efd9ce9d9c62025014",
+      "name": "device6"
+    },
+    {
+      "id": "66c6a5efd9ce9d9c62025015",
+      "name": "device7"
+    },
+    {
+      "id": "66c6a5efd9ce9d9c62025016",
+      "name": "device8"
+    },
+    {
+      "id": "66c6a5efd9ce9d9c62025017",
+      "name": "pH_m3"
+    },
+    {
+      "id": "66c6a5efd9ce9d9c62025018",
+      "name": "hfahodhgi"
+    },
+    {
+      "name": "hello",
+      "id": "t3ADRWS"
     }
   ]
-  
 }

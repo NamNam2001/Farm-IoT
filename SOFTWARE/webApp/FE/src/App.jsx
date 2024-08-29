@@ -1,77 +1,34 @@
-// import React from "react";
-// import { Resource, Admin, ListGuesser, Layout, Menu, defaultTheme, CustomRoutes, Title } from 'react-admin';
-// import { Route } from 'react-router-dom';
-// import simpleRestProvider from "ra-data-simple-rest"
-// // import authProvider from "./authProvider";
-// import Dashboard1 from './Dashboard1';
-// import Dashboard2 from './Dashboard2';
-// import CustomDashboard from './CustomDashboard'; // Import CustomDashboard
-
-// // import {listProducts} from "./components/Products"
-// import Dashboard from "./components/Dashboard";
-// import UsersList from "./components/UsersList";
-
-// const lightTheme = defaultTheme;
-// const darkTheme = { ...defaultTheme, palette: { mode: 'dark' } };
-
-// export default () => {
-//   const URL = "http://192.168.1.54:3001"
-//   return (
-//     <div className="App">
-//       {/* <Admin  dashboard={Dashboard} dataProvider={simpleRestProvider(URL)} theme={lightTheme} darkTheme={darkTheme}>
-//         <Resource name = 'dashboard' list/>
-//         <Resource name = 'Hello' list/>
-//         <Resource name = 'users' list={UsersList}/>
-//       </Admin> */}
-//       <Admin dataProvider={simpleRestProvider(URL)} dashboard={CustomDashboard}>
-//         <Resource name='users' list={ListGuesser} />
-//         <CustomRoutes>
-//           {/* <Route path="/dashboard1" element={<Dashboard name = "Dashboard1"/>} />
-//           <Route path="/dashboard2" element={<Dashboard name = "Dashboard2"/>}/> */}
-//           {dashboardRoutes.map((dashboard) => (
-//             <Route
-//               key={dashboard.name} // Sử dụng key để xác định mỗi Route
-//               path={`/dashboard/${dashboard.name}`}
-//               element={<Dashboard name={dashboard.name} data={dashboard.data} />}
-//             />
-//           ))}
-
-//         </CustomRoutes>
-//       </Admin>
-//     </div>
-//   )
-// }
-
-
 import React, {useState, useEffect} from "react";
-import { Resource, Admin, ListGuesser, Layout, Menu, defaultTheme, CustomRoutes, Title } from 'react-admin';
+import { Resource, Admin, ListGuesser, Layout, Menu, defaultTheme, CustomRoutes, Title , EditGuesser, Create} from 'react-admin';
 import { Route } from 'react-router-dom';
 import simpleRestProvider from "ra-data-simple-rest"
-// import authProvider from "./authProvider";
-import Dashboard1 from './Dashboard1';
-import Dashboard2 from './Dashboard2';
-import CustomDashboard from './CustomDashboard'; // Import CustomDashboard
-
-// import {listProducts} from "./components/Products"
+import CustomDashboard from './CustomDashboard';
 import Dashboard from "./components/Dashboard";
-import UsersList from "./components/UsersList";
+import { DeviceList } from "./components/DeviceList";
+import { DeviceCreate } from "./components/DeviceCreate";
+import { DashboardCreate } from "./components/DashboardCreate";
+import { DashboardEdit } from "./components/DashboardEdit";
+import { DeviceEdit } from "./components/DeviceEdit";
+import axios from "axios";
 
 const lightTheme = defaultTheme;
 const darkTheme = { ...defaultTheme, palette: { mode: 'dark' } };
 
 const App = () => {
-  const URL = "http://192.168.1.60:8000";
+  const URL = "https://farmiot-api.onrender.com";
   const [dashboardRoutes, setDashboardRoutes] = useState([]);
+  const [devices, setDevices] = useState([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await fetch(`${URL}/dashboards`);
-        const data = await response.json();
-        console.log(data)
+        const response = await axios.get(`${URL}/dashboards`);
+        const data = await response.data;
+        // console.log(data)
         const formattedDashboardRoutes = data.map(dashboard => ({
-          id: dashboard.dashboardId,
-          name: dashboard.dashboardId,
+          id: dashboard.id,
+          name: dashboard.name,
+          devices: dashboard.devices
         }));
         
         setDashboardRoutes(formattedDashboardRoutes); 
@@ -83,27 +40,40 @@ const App = () => {
 
     fetchDashboardData();
   }, []);
+useEffect(() => {
+    const fetchDeviceData = async () => {
+      try {
+        const response = await axios.get(`${URL}/devices`);
+        const data = await response.data;
+         
+        setDevices(data); 
+        // console.log(dashboardRoutes)
+      } catch (error) {
+        console.error('Error fetching devices data:', error);
+      }
+    };
 
-  console.log(dashboardRoutes)
+    fetchDeviceData();
+  }, []);
+
 
   return (
     // {dashboardRoutes.length > 0 && (
     <div className="App">
-      {dashboardRoutes.length > 0 && (
+      
         <Admin dataProvider={simpleRestProvider(URL)} dashboard={() => <CustomDashboard dashboardRoutes={dashboardRoutes} />}>
-          <Resource name="users" list={ListGuesser} />
-          <Resource name="devices" list={ListGuesser} />
+          <Resource name="devices" list={DeviceList(devices)} edit={DeviceEdit} create={DeviceCreate} />
+          <Resource name="dashboards" create={DashboardCreate(devices)} edit={DashboardEdit(devices)}/>
           <CustomRoutes>
             {dashboardRoutes.map((dashboard) => (
               <Route
                 key={dashboard.id}
-                path={`/dashboards/${dashboard.name}`}
-                element={<Dashboard name={dashboard.name} />}
+                path={`/dashboards/${dashboard.id}/show`}
+                element={<Dashboard name={dashboard.name} devices={dashboard.devices}/>}
               />
             ))}
           </CustomRoutes>
         </Admin>
-      )}
     </div>
   );
 }

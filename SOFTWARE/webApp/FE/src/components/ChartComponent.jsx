@@ -3,142 +3,8 @@ import * as echarts from "echarts";
 import "../../node_modules/rsuite/DateRangePicker/styles/index.css";
 import DateRangePicker from "rsuite/DateRangePicker";
 import "./styles.css";
-import DateRangeIcon from "@mui/icons-material/DateRange";
 import { startOfDay, endOfDay, addDays, subDays } from "date-fns";
 import axios from "axios";
-import { Show } from "react-admin";
-
-// var chartDom = document.getElementById('main');
-// var myChart = echarts.init(chartDom);
-// var option;
-
-// let base = +new Date(1968, 9, 3);
-// let oneDay = 24 * 3600 * 1000;
-// let date = [
-//   '',
-//   '2024/05/05 10:33:20',
-//   '2024/05/05 10:33:29',
-//   '2024/05/05 10:34:39',
-//   '2024/05/05 10:35:00',
-//   '2024/05/06 10:33:20',
-//   '2024/05/06 10:33:29',
-//   '2024/05/06 10:34:39',
-//   '2024/05/06 10:35:00',
-//   '2024/05/07 10:33:20',
-//   '2024/05/07 10:33:29',
-//   '2024/05/07 10:34:39',
-//   '2024/05/07 10:35:00',
-//   '2024/05/08 10:33:20',
-//   '2024/05/08 10:33:29',
-//   '2024/05/08 10:34:39',
-//   '2024/05/08 10:35:00',
-//   '2024/05/09 10:33:29',
-//   '2024/05/09 10:34:39',
-//   '2024/05/09 10:35:00',
-//   '2024/05/06 10:33:20',
-//   '2024/05/10 10:33:29',
-//   '2024/05/10 10:34:39',
-//   '2024/05/10 10:35:00',
-//   '2024/05/11 10:33:20',
-//   '2024/05/11 10:33:29',
-//   '2024/05/11 10:34:39',
-//   '2024/05/12 10:35:00',
-//   '2024/05/12 10:33:20',
-//   '2024/05/13 10:33:29',
-//   '2024/05/13 10:34:39',
-//   '2024/05/13 10:35:00'
-// ];
-// let data = [2, 3, 4, 5,7,8,6,4,3,5,6,7,8,6,5,7, 2, 3, 4, 5,7,8,6,4,3,5,6,7,8, 6,7,8];
-
-// let dates = [];
-//   for (let i = 1; i < date.length; i++) {
-//     let currentDate = new Date(date[i]);
-//     let previousDate = new Date(date[i - 1]);
-
-//     let currentDay = currentDate.getDate();
-//     let previousDay = previousDate.getDate();
-
-//     if (currentDay !== previousDay) {
-//       dates.push(date[i]); // Hiển thị toàn bộ ngày giờ của phần tử hiện tại nếu ngày khác với phần tử trước đó
-//     } else {
-//       dates.push(date[i].split(' ')[1]); // Chỉ hiển thị giờ của phần tử hiện tại nếu ngày giống với phần tử trước đó
-//     }
-//   }
-// for (let i = 1; i < 20000; i++) {
-//   var now = new Date((base += oneDay));
-//   date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/')+ ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds());
-//   data.push(Math.round((Math.random() + 0.5) * 20 ));
-// }
-
-// console.log(date)
-// console.log(data)
-// option = {
-//   tooltip: {
-//     trigger: 'axis',
-//     position: function (pt) {
-//       return [pt[0], '10%'];
-//     }
-//   },
-//   title: {
-//     left: 'center',
-//     text: 'Large Area Chart'
-//   },
-//   toolbox: {
-//     feature: {
-//       dataZoom: {
-//         yAxisIndex: 'none'
-//       },
-//       restore: {},
-//       saveAsImage: {}
-//     }
-//   },
-//   xAxis: {
-//     type: 'category',
-//     boundaryGap: false,
-//     data: dates
-//   },
-//   yAxis: {
-//     type: 'value',
-//     boundaryGap: [0, '100%']
-//   },
-//   dataZoom: [
-//     {
-//       type: 'inside',
-//       // start: 0,
-//       // end: 100
-//       throttle: 50
-//     },
-//     {
-//       start: 0,
-//       end: 10
-//     }
-//   ],
-//   series: [
-//     {
-//       name: 'Fake Data',
-//       type: 'line',
-//       symbol: 'circle',
-//       sampling: 'lttb',
-//       itemStyle: {
-//         color: 'rgb(255, 70, 131)'
-//       },
-//       areaStyle: {
-//         color: new echarts.graphic.LinearGradient(0, 0, 0, 0, [
-//           {
-//             offset: 0,
-//             color: 'rgb(255, 158, 68)'
-//           },
-//           {
-//             offset: 1,
-//             color: 'rgb(255, 70, 131)'
-//           }
-//         ])
-//       },
-//       data: data
-//     }
-//   ]
-// };
-// option && myChart.setOption(option);
 
 let data = [];
 let date = [];
@@ -247,8 +113,8 @@ const Ranges = [
 ];
 
 const ChartComponent = ({ dashboardId, id, name, data, date }) => {
-  const ip = "192.168.1.60:8000";
-  const URL = "http://"+ip;
+  const ip = "farmiot-api.onrender.com";
+  const URL = "https://"+ip;
   const [options, setOptions] = useState(option);
   const [messages, setMessages] = useState("");
   const ws = useRef(null);
@@ -305,7 +171,7 @@ const ChartComponent = ({ dashboardId, id, name, data, date }) => {
   }, [chartData]);
 
   useEffect(() => {
-    ws.current = new WebSocket(`ws://${ip}/socket/${dashboardId}/${id}`);
+    ws.current = new WebSocket(`wss://${ip}/socket/${dashboardId}/${id}`);
 
     ws.current.onmessage = (event) => {
       console.log(event.data);

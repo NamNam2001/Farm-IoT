@@ -6,62 +6,52 @@ import { Title } from 'react-admin';
 import axios from 'axios';
 
 
-// let date = [
-//   '',
-//   '2024/05/05 10:33:20',
-//   '2024/05/05 10:33:29',
-//   '2024/05/05 10:34:39',
-//   '2024/05/05 10:35:00',
-//   '2024/05/06 10:33:20',
-//   '2024/05/06 10:33:29',
-//   '2024/05/06 10:34:39',
-//   '2024/05/06 10:35:00',
-//   '2024/05/07 10:33:20',
-//   '2024/05/07 10:33:29',
-//   '2024/05/07 10:34:39',
-//   '2024/05/07 10:35:00',
-//   '2024/05/08 10:33:20',
-//   '2024/05/08 10:33:29',
-//   '2024/05/08 10:34:39',
-//   '2024/05/08 10:35:00',
-//   '2024/05/09 10:33:29',
-//   '2024/05/09 10:34:39',
-//   '2024/05/09 10:35:00',
-//   '2024/05/06 10:33:20',
-//   '2024/05/10 10:33:29',
-//   '2024/05/10 10:34:39',
-//   '2024/05/10 10:35:00',
-//   '2024/05/11 10:33:20',
-//   '2024/05/11 10:33:29',
-//   '2024/05/11 10:34:39',
-//   '2024/05/12 10:35:00',
-//   '2024/05/12 10:33:20',
-//   '2024/05/13 10:33:29',
-//   '2024/05/13 10:34:39',
-//   '2024/05/13 10:35:00'
-// ];
-// let data = [2, 3, 4, 5,7,8,6,4,3,5,6,7,8,6,5,7, 2, 3, 4, 5,7,8,6,4,3,5,6,7,8, 6,7,8];
-// let data1 = [5, 15, 40, 55,70,80,60,40,30,50,60,70,80,60,50,70, 20, 30, 4, 5,7,8,6,4,3,5,6,7,8, 6,7,8];
-
-const Dashboard = ({name}) => {
-  const URL = "http://192.168.1.60:8000";
-  const [data, setData] = useState([]);
+const Dashboard = ({name, devices}) => {
+  const [data, setData] = useState({});
+  const [listTypesDevice, setListTypesDevice] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  let dataDashboard= {
+    "dashboardId": name,
+    "name": name,
+    "data": []
+  }
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${URL}/dashboards/${name}`);
-        // console.log(response)
-        setData(response.data);
+        const responses = await Promise.all(
+          devices.map(deviceId =>
+            axios.get(`https://farmiot-api.onrender.com/dashboards/${deviceId}/listTypes`)
+          )
+        );
+  
+        const updatedDataDashboard = { ...dataDashboard };
+  
+        responses.forEach(response => {
+          const { deviceId, types } = response.data;
+          types.forEach(type => {
+            const deviceTypeId = `${deviceId}-${type}`;
+            updatedDataDashboard.data.push({
+              "device_id": deviceTypeId,
+              "name": deviceTypeId,
+              "data": [],
+              "date": []
+            });
+          });
+        });
+  
+        setListTypesDevice(updatedDataDashboard.data.map(item => item.device_id));
+        setData(updatedDataDashboard);
       } catch (error) {
-        setError(error.message);
+        setError(error);
       }
     };
-
+  
     fetchData();
-  }, [name]);
+  }, [name, devices]);
   console.log(data)
   return (
     <div className="dashboard">
