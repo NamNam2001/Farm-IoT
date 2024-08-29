@@ -1,5 +1,5 @@
 node_modules
 dist
 .cache
-./database.json
-./content-range.js
+database.json
+content-range.js
