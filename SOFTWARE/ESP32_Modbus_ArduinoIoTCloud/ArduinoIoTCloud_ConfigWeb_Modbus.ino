@@ -1,5 +1,4 @@
-// have Config Things
-
+// Config Things
 #include "thingProperties.h"
 #include "ModbusRTU.h"
 #include <ArduinoIoTCloud.h>
@@ -11,10 +10,6 @@
 #include "ArduinoJson.h"
 #include "list_device.h"
 
-// #define REG 0       // thanh ghi bắt đầu
-// #define REG_NUM 9   // số lượng thanh ghi cần lấy
-// #define SLAVE_ID1 3 // địa chỉ ID slave 1
-// #define SLAVE_ID2 2 // địa chỉ ID slave 2
 #define BAUDRATE 9600
 #define MBUS_HW_SERIAL Serial2
 
@@ -49,14 +44,13 @@ Modbus::ResultCode readSync(uint8_t address, uint16_t start, uint16_t num, uint1
     xSemaphoreGive(xMutex); // đồng bộ hoá sự kiện giữa các task-> kết thúc
     return Modbus::EX_GENERAL_FAILURE;
   }
-  // Serial.printf("SlaveID: %d Hreg %d\r\n", address, start);
   mb.readHreg(address, start, buf, num, [](Modbus::ResultCode event, uint16_t, void *) // thực hiện funtion 4 theo tiêu chuẩn giao thức modbusRTU
               {
     err = event;
     return true; });
   while (mb.slave())
   {
-    vTaskDelay(100); // thời gian đợi kết thúc gói truyền của từng ID *2 để ra thời gian của toàn bộ 1 gói tin
+    vTaskDelay(100);
     mb.task();
   }
   Modbus::ResultCode res = err;
@@ -93,29 +87,6 @@ settings user = {};
 WiFiClientSecure client;
 
 void handleScan(JsonObject obj)
-// {
-//   String networks = "";
-//   int8_t numNetworks;
-//   {
-
-//     numNetworks = WiFi.scanNetworks();
-//     if (numNetworks == 0)
-//     {
-//       networks += "<p>No networks found</p>";
-//     }
-//     else
-//     {
-//       networks += "<table style='width: " + String("100%") + ";'><tr><th>SSID</th><th>(RSSI)</th></tr>";
-//       Serial.println(numNetworks);
-//       for (int8_t i = 0; i < numNetworks; i++)
-//       {
-//         networks += "<tr><td>" + WiFi.SSID(i) + "</td><td>" + String(WiFi.RSSI(i)) + " dBm</td></tr>";
-//       }
-//       networks += "</table>";
-//       server.send(200, "text/html", "<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Wifi Setup</title> <style>*,::after,::before{box-sizing:border-box;}body{margin:0;font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans','Liberation Sans';font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#f5f5f5;}.form-control{display:block;width:100%;height:calc(1.5em + .75rem + 2px);border:1px solid #ced4da;}button{cursor: pointer;border:1px solid transparent;color:#fff;background-color:#007bff;border-color:#007bff;padding:.5rem 1rem;font-size:1.25rem;line-height:1.5;border-radius:.3rem;width:100%}.form-signin{width:100%;max-width:400px;padding:15px;margin:auto;}h1{text-align: center} h3{text-align: center} th{text-align: left}</style> </head> <body><main class='form-signin'> <form action='/' method='post'> <h1 class=''>Wifi Manager</h1> <div> <h3>Scan Wifi</h3>" + networks + " </div> <h3>Configure Wifi</h3> <div class='form-floating'><label>SSID</label><input type='text' class='form-control' name='ssid'> </div><div class='form-floating'><br/><label>Password</label><input type='password' class='form-control' name='password'></div><br/><br/><button type='submit'>Save</button><p style='text-align: right'><a href='https://huetronics.vn/' style='color: #32C5FF'>huetronics.vn</a></p></form></main> </body></html>");
-//     }
-//   }
-// }
 {
   String networks = "";
   int8_t numNetworks;
@@ -123,15 +94,6 @@ void handleScan(JsonObject obj)
   String options_device = "";
 
   {
-    // if (user.ssid[0] == '\0')
-    // {
-    //   numNetworks = scanWiFiNetworks();
-    // }
-    // else
-    // {
-    //   numNetworks = wifi_scanned.num_netWorks;
-    // }
-    // numNetworks = scanWiFiNetworks();
     numNetworks = WiFi.scanNetworks();
     if (numNetworks == 0)
     {
@@ -143,16 +105,7 @@ void handleScan(JsonObject obj)
       Serial.println(numNetworks);
       for (int8_t i = 0; i < numNetworks; i++)
       {
-        // if (user.ssid[0] == '\0')
-        // {
-        //   networks += "<tr><td>" + WiFi.SSID(i) + "</td><td>" + String(WiFi.RSSI(i)) + " dBm</td></tr>";
-        // }
-        // else
-        // {
-        //   networks += "<tr><td>" + wifi_scanned.ssid[i] + "</td><td>" + String(wifi_scanned.rssi[i]) + " dBm</td></tr>";
-        // }
         networks += "<tr><td>" + WiFi.SSID(i) + "</td><td>" + String(WiFi.RSSI(i)) + " dBm</td></tr>";
-        // networks += "<tr><td>" + wifi_scanned.ssid[i] + "</td><td>" + String(wifi_scanned.rssi[i]) + " dBm</td></tr>";
       }
       networks += "</table>";
 
@@ -174,28 +127,6 @@ void handleScan(JsonObject obj)
 }
 
 void handlePortal()
-// {
-//   if (server.method() == HTTP_POST)
-//   {
-
-//     strncpy(user.ssid, server.arg("ssid").c_str(), sizeof(user.ssid));
-//     strncpy(user.password, server.arg("password").c_str(), sizeof(user.password));
-//     user.ssid[server.arg("ssid").length()] = user.password[server.arg("password").length()] = '\0';
-//     user.mode = 1;
-//     EEPROM.put(0, user);
-//     EEPROM.commit();
-//     Serial.println(user.ssid);
-//     Serial.println(user.password);
-//     Serial.println(user.mode);
-
-//     server.send(200, "text/html", "<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Wifi Manager</title><style>*,::after,::before{box-sizing:border-box;}body{margin:0;font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans','Liberation Sans';font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#f5f5f5;}.form-control{display:block;width:100%;height:calc(1.5em + .75rem + 2px);border:1px solid #ced4da;}button{border:1px solid transparent;color:#fff;background-color:#007bff;border-color:#007bff;padding:.5rem 1rem;font-size:1.25rem;line-height:1.5;border-radius:.3rem;width:100%}.form-signin{width:100%;max-width:400px;padding:15px;margin:auto;}h1,p{text-align: center}</style> </head> <body><main class='form-signin'> <h1>Wifi Setup</h1> <br/> <p>Your settings have been saved successfully!<br />Please restart the device.</p></main></body></html>");
-//     ESP.restart();
-//   }
-//   else
-//   {
-//     handleScan();
-//   }
-// }
 {
   char things[15];
   DynamicJsonDocument doc(1024);
@@ -269,8 +200,8 @@ uint16_t hregs1[5]; // thanh ghi ID1 PH
 uint16_t hregs2[2]; // thanh ghi ID2 temp & humidity
 uint16_t hregs3[2]; // thanh ghi ID3 Light Sensor
 uint16_t hregs4[1]; // thanh ghi ID4 RainFall
-uint16_t hregs5[5]; // thanh ghi ID4 RainFall
-uint16_t hregs6[5]; // thanh ghi ID4 RainFall
+uint16_t hregs5[5]; // thanh ghi ID5 pH
+uint16_t hregs6[5]; // thanh ghi ID6 pH DO
 
 String dataprint = "";
 void SendModbusID1(void *pvParameters)
@@ -278,8 +209,6 @@ void SendModbusID1(void *pvParameters)
   while (true)
   {
     vTaskDelay(1);
-    // if (user.status == 1){
-    // Serial.println("tao o day");
     ArduinoCloud.update();
   }
 }
@@ -296,15 +225,9 @@ void ReadModbusID1(void *pvParameters)
   while (true)
   {
     vTaskDelay(1);
-    // if (user_wifi.status == 1){
-    // Serial.println("nam");
-    // Read PH1
     ssid_val = user.ssid;
     if (readSync1(1, 0, 5, hregs5) == Modbus::EX_SUCCESS)
     {
-      // hiển thị 5 giá trị data của mỗi ID ra cổng serial mỗi data = 2byte
-      // dataprint = "Data ID1: " + String(hregs1[0]) + " : " + String(hregs1[1]) + " : " + String(hregs1[2]) + " : " + String(hregs1[3]) + " : " + String(hregs1[4]); //+" Data ID2: " + String(hregs2[0]) + " : " + String(hregs2[1]) + " : " + String(hregs2[2])+ " : " + String(hregs2[3]) + " : " + String(hregs2[4]);
-      // Serial.println(dataprint);
       temp = hregs5[2] * 0.1;
       ph = hregs5[0] * 0.01;
       if ((temp > 0) & (temp < 100))
@@ -315,11 +238,6 @@ void ReadModbusID1(void *pvParameters)
         ph_val = ph;
       else
         ph_val = 0;
-      // Serial.println(dataprint);
-      // oRP  = hregs2[0]; // muon do pH tren bo ID2 phai bo sung lai cam bien pH. Moi thoi diem chi co the do 1 thong so pH hoac ORP
-      // dO   = hregs1[2] * 0.01; //%x0.1 - ppm*0.01 DO
-      // doam = 87;
-      //  ArduinoCloud.update();
     }
     else
     {
@@ -390,17 +308,8 @@ void ReadModbusID1(void *pvParameters)
     }
 
     // Read PH CHINA
-    // SOSS temp
-    // have ph_china then
-
     if (readSync(5, 1008, 4, hregs1) == Modbus::EX_SUCCESS)
     {
-      // hiển thị 5 giá trị data của mỗi ID ra cổng serial mỗi data = 2byte
-      // dataprint = "Data ID1: " + String(hregs1[0]) + " : " + String(hregs1[1]) + " : " + String(hregs1[2]) + " : " + String(hregs1[3]) + " : " + String(hregs1[4]); //+" Data ID2: " + String(hregs2[0]) + " : " + String(hregs2[1]) + " : " + String(hregs2[2])+ " : " + String(hregs2[3]) + " : " + String(hregs2[4]);
-      // Serial.println(dataprint);
-      // temp = hregs1[2] * 0.1;
-      // ph = hregs1[0] * 0.01;
-
       // convert 2x int16 to 32-bit
       uint32_t pH = (hregs1[0] << 0 | hregs1[1] << 16);
       uint32_t temp = (hregs1[2] << 0 | hregs1[3] << 16);
@@ -413,22 +322,7 @@ void ReadModbusID1(void *pvParameters)
 
       temp_val2 = (temp_convert > 0 && temp_convert < 100) ? temp_convert : 0;
       ph_val2 = (pH_convert > 0 && pH_convert < 14) ? pH_convert : 0;
-
-      // Serial.println(dataprint);
-      // oRP  = hregs2[0]; // muon do pH tren bo ID2 phai bo sung lai cam bien pH. Moi thoi diem chi co the do 1 thong so pH hoac ORP
-      // dO   = hregs1[2] * 0.01; //%x0.1 - ppm*0.01 DO
-      // doam = 87;
-      //  ArduinoCloud.update();
     }
-
-    // else
-    // {
-    //   temp_val2 = 0;
-    //   ph_val2 = 0;
-    //   // temp_val = random(1, 11); // random() includes the lower bound but excludes the upper bound
-    //   // ph_val = random(1, 11);
-    //   // do_val2 = 0;
-    // }
 
     if (strcmp(user.things, "PH3") == 0)
     {
@@ -440,8 +334,6 @@ void ReadModbusID1(void *pvParameters)
     // Read ES35
     if (readSync(2, 0, 2, hregs2) == Modbus::EX_SUCCESS)
     {
-      // hiển thị 5 giá trị data của mỗi ID ra cổng serial mỗi data = 2byte
-      // dataprint = "Data ID1: " + String(hregs1[0]) + " : " + String(hregs1[1]); //+" Data ID2: " + String(hregs2[0]) + " : " + String(hregs2[1]) + " : " + String(hregs2[2])+ " : " + String(hregs2[3]) + " : " + String(hregs2[4]);
       temperature = (hregs2[0] * 0.1);
       humidity = (hregs2[1] * 0.1);
 
@@ -456,9 +348,6 @@ void ReadModbusID1(void *pvParameters)
     // Read data light sensor
     if (readSync(3, 7, 2, hregs3) == Modbus::EX_SUCCESS)
     {
-      // hiển thị 5 giá trị data của mỗi ID ra cổng serial mỗi data = 2byte
-      // dataprint2 = "Data ID2: " + String(hregs3[7]) + String(hregs3[8]); //+" Data ID2: " + String(hregs2[0]) + " : " + String(hregs2[1]) + " : " + String(hregs2[2])+ " : " + String(hregs2[3]) + " : " + String(hregs2[4]);
-      // rainFall = (humidity <0 && humidity > 100)? (hregs1[1] * 0.1) : 0;
       light_val = hregs3[0] * 65536 + hregs3[1];
       // Serial.println(dataprint2);
       Serial.println(light_val);
@@ -471,10 +360,7 @@ void ReadModbusID1(void *pvParameters)
     // Read data rainFall
     if (readSync(4, 0, 2, hregs4) == Modbus::EX_SUCCESS)
     {
-      // hiển thị 5 giá trị data của mỗi ID ra cổng serial mỗi data = 2byte
-      // dataprint1 = "Data ID2: " + String(hregs2[0]); //+" Data ID2: " + String(hregs2[0]) + " : " + String(hregs2[1]) + " : " + String(hregs2[2])+ " : " + String(hregs2[3]) + " : " + String(hregs2[4]);
-      // rainFall = (humidity <0 && humidity > 100)? (hregs1[1] * 0.1) : 0;
-      sum_rainFall = hregs4[0] * 0.1; // sum mưa
+      sum_rainFall = hregs4[0] * 0.1; // sum rainFall
 
       if (sum_rainFall - previous_rainFall > 0)
       {
@@ -512,23 +398,6 @@ void ReadModbusID1(void *pvParameters)
     Serial.println("PH");
     Serial.println(temp_val2);
     Serial.println(ph_val2);
-    // Serial.println(temp_val2);
-    // Serial.println(ph_val2);
-    // Serial.println(do_val);
-    // Serial.println("ES35");
-    // Serial.println(temperature);
-    // Serial.println(humidity);
-    // Serial.println("light");
-    // Serial.println(light_val);
-    // Serial.println("rainFall");
-    // Serial.println(rainFall);
-    // Serial.println("sum_rainFall");
-    // Serial.println(sum_rainFall);
-    // Serial.println(firmware_Ver);
-    // Serial.println("Namdeptrai");
-    // Serial.println("Sent Arduino Cloud data");
-    // Serial.println("Update OTA Pro");
-    // Serial.println("Update ota Prox2");
 
     if (touchRead(touchPin) < 20)
     {
@@ -609,6 +478,7 @@ void RetryWifi(void *pvParameters)
   EEPROM.put(0, user);
   EEPROM.commit();
   ESP.restart();
+  ArduinoCloud.connected();
 }
 
 void OTA_Update(void *PvParameters)
@@ -634,6 +504,7 @@ void setup()
   WiFi.mode(WIFI_STA);
   WiFi.begin(user.ssid, user.password);
   Serial.println(user.mode);
+  Serial.available();
 
   while (WiFi.status() != WL_CONNECTED)
   {
