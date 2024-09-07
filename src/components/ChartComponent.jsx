@@ -113,7 +113,7 @@ const Ranges = [
 ];
 
 const ChartComponent = ({ dashboardId, id, name, data, date }) => {
-  const ip = "farmiot-api.onrender.com";
+  const ip = "iot-farm-pysj.onrender.com";
   const URL = "https://"+ip;
   const [options, setOptions] = useState(option);
   const [messages, setMessages] = useState("");
@@ -144,7 +144,7 @@ const ChartComponent = ({ dashboardId, id, name, data, date }) => {
     console.log(dashboardId);
     console.log(id);
     console.log(rangeTimeQuery);
-    const response = await axios.get(`${URL}/data/${dashboardId}/${id}`, {
+    const response = await axios.get(`${URL}/data/${id}`, {
       params: {
         startDate: rangeTimeQuery[0],
         endDate: rangeTimeQuery[1],
@@ -171,7 +171,7 @@ const ChartComponent = ({ dashboardId, id, name, data, date }) => {
   }, [chartData]);
 
   useEffect(() => {
-    ws.current = new WebSocket(`wss://${ip}/socket/${dashboardId}/${id}`);
+    ws.current = new WebSocket(`wss://${ip}/socket/${id}`);
 
     ws.current.onmessage = (event) => {
       console.log(event.data);
@@ -194,7 +194,7 @@ const ChartComponent = ({ dashboardId, id, name, data, date }) => {
         ranges={Ranges}
         defaultValue={Ranges[2].value}
       />
-      <div id={id} style={{ width: "100%", height: "280%" }} />
+      <div id={id} style={{ width: "99%", height: "280%" }} />
       <div className="value">Value: {messages}</div>
       {chartData.data.length === 0 && (
       <div

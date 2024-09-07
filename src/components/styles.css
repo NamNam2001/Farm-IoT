@@ -42,3 +42,9 @@
 /* .rs-input-group.rs-input-group-inside .rs-input {
     display: none;
 } */
+
+
+.chart-style {
+    width: 100%;
+    height: 280%;
+}

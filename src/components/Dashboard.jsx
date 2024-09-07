@@ -24,7 +24,7 @@ const Dashboard = ({name, devices}) => {
       try {
         const responses = await Promise.all(
           devices.map(deviceId =>
-            axios.get(`https://farmiot-api.onrender.com/dashboards/${deviceId}/listTypes`)
+            axios.get(`https://iot-farm-pysj.onrender.com/dashboards/${deviceId}/listTypes`)
           )
         );
   

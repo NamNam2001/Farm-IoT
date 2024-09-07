@@ -15,7 +15,7 @@ const lightTheme = defaultTheme;
 const darkTheme = { ...defaultTheme, palette: { mode: 'dark' } };
 
 const App = () => {
-  const URL = "https://farmiot-api.onrender.com";
+  const URL = "https://iot-farm-pysj.onrender.com";
   const [dashboardRoutes, setDashboardRoutes] = useState([]);
   const [devices, setDevices] = useState([]);
 
