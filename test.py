@@ -129,12 +129,8 @@ async def add_device(request: Request):
     return formatted_device(new_device)
 
 @app.get('/devices/{device_id}')
-async def get_device(device_id: str):
-    # print(device_id)                                                                                                                                                                                                              
+async def get_device(device_id: str):                                                                                                                                                                                                         
     device = await app.mongodb.devices.find_one({"_id": ObjectId(device_id)})
-    # formatted_device = {'id': str(device['_id']), 'name': device['name']}                               
-    # print(formatted_device)                 
-    # response.headers["Content-Range"] = f"items {1}-{10-1}/{20}"
     return formatted_device(device)
 
 @app.put('/devices/{device_id}')
@@ -191,14 +187,8 @@ async def get_list_dashboards():
 async def add_dashboard(request: Request):
     payload = await request.json() 
     payload["devices"] = [ObjectId(device_id) for device_id in payload["devices"]]
-    # print(payload)
-
     add_dashboard = await app.mongodb.dashboards.insert_one(payload)
-
     new_dashboard = await app.mongodb.dashboards.find_one({"_id": add_dashboard.inserted_id})
-    # formatted_dashboard = {'id': str(new_dashboard['_id']), 'name': new_dashboard['name'], 'devices': [str(device_id) for device_id in new_dashboard.get('devices', [])]}
-    # devices = await app.mongodb.devices.find({"_id": {"$in": new_dashboard['devices']}}).to_list(length=100)
-    # new_dashboard['devices'] = [device['name'] for device in devices]
 
     return formatted_dashboard(new_dashboard)
 
@@ -236,32 +226,6 @@ async def delete_dashboard(dashboard_id: str):
 @app.get('/')
 async def home():
     return "Farm_iot"
-
-# @app.get('/dashboards')
-# async def get_data():
-#     values_query = []
-#     query = """
-#     from(bucket: "Farm_Iot")
-#         |> range(start: -7d)
-#         |> filter(fn: (r) => r["_measurement"] == "dashboard_data")
-#         |> keep(columns: ["dashboard_id"])
-#         |> distinct(column: "dashboard_id")
-#         |> sort(columns: ["dashboard_id"])
-#     """
-#     tables = query_api.query(query, org="HTR")
-
-#     for table in tables:
-#         for record in table.records:
-#             # time_record = (record["_time"]+ timedelta(hours=7)).strftime("%Y-%m-%d %H:%M:%S")
-#             value_query = {
-#                 # "deviceId": record["device_id"],
-#                 # "day": time_record.split()[0],
-#                 # "time": time_record.split()[1],
-#                 # "value": record["_value"]
-#                 "dashboardId": record["dashboard_id"],
-#             }
-#             values_query.append(value_query)
-#     return values_query
 
 from typing import List
 
@@ -304,9 +268,8 @@ async def get_device_types(deviceId: str):
     print(result)
     return result
 
-@app.get('/data/{dashboardId}/{deviceTypeId}')
+@app.get('/data/{deviceTypeId}')
 async def get_dashboard_data(
-    dashboardId: str,
     deviceTypeId: str,
     startDate: str ,
     endDate: str ):
@@ -347,23 +310,9 @@ async def get_dashboard_data(
             device_query["date"].append(time_record)
     print(device_query)
     return device_query
-            
-    #         # If device_id does not exist, create new entry
-    #         if not device_exists:
-    #             new_device_query = {  
-    #                 "device_id": device_id,
-    #                 "name": device_id,
-    #                 "data": [value],
-    #                 "date": ["", time_record]
-    #             }
-    #             dashboards_query["data"].append(new_device_query)
-    
-    # return dashboards_query
 
-
-
-@app.post('/post-data/{dashboardId}/{id}')
-async def add_sensor(dashboardId: str, id: str, request: Request):
+@app.post('/post-data/{id}')
+async def add_sensor(id: str, request: Request):
     _json = await request.json()
     global currentValue 
     data = _json["value"]
@@ -387,23 +336,17 @@ async def add_sensor(dashboardId: str, id: str, request: Request):
 
     random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     #wiring data to current Value
-    if dashboardId not in currentValue:
-        currentValue[dashboardId] = {}
 
-    if id not in currentValue[dashboardId]:
-        currentValue[dashboardId][id] = [data, random_string]
+    if id not in currentValue:
+        currentValue[id] = [data, random_string]
     else:
-        currentValue[dashboardId][id] = [data, random_string]
+        currentValue[id] = [data, random_string]
 
     print(currentValue)
 
-    # print("Data sent successfully")
-   
-#     # return {"message": "Data received successfully"}
 
-
-@app.websocket("/socket/{dashboardId}/{deviceTypeId}")
-async def websocket_endpoint(dashboardId: str, deviceTypeId: str, websocket: WebSocket):
+@app.websocket("/socket/{deviceTypeId}")
+async def websocket_endpoint(deviceTypeId: str, websocket: WebSocket):
     print('a new websocket to create.')
     await websocket.accept()
     # current_value = None
@@ -413,20 +356,17 @@ async def websocket_endpoint(dashboardId: str, deviceTypeId: str, websocket: Web
     type = deviceTypeId.split('-')[1]
     while True:
         try:
-            if dashboardId in currentValue and id in currentValue[dashboardId]:
-                if random_string != currentValue[dashboardId][id][1]:
-                    random_string = currentValue[dashboardId][id][1]
+            if id in currentValue:
+                if random_string != currentValue[id][1]:
+                    random_string = currentValue[id][1]
                     last_update_time = datetime.now()
-                    await websocket.send_json(currentValue[dashboardId][id][0][type])
+                    await websocket.send_json(currentValue[id][0][type])
                 else:
                     if datetime.now() - last_update_time > timedelta(minutes=1):
-                        del currentValue[dashboardId][id]
+                        del currentValue[id]
             else:
                 await websocket.send_json(None)
             
-            # print(currentValue[dashboardId][id][0][type])
-            # else:
-            #     continue
         except Exception as e:
             print('error:', e)
             break
