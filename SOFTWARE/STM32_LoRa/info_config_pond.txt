@@ -1,0 +1,46 @@
+Các bước cấu hình chọn Ao và Chế độ đọc:
++ B1: Nhấn giữ nút khoảng 3 giây thì nhả tay ra (nếu thấy 4 led nhấp nháy thì đã vào chế độ cài đặt)
++ B2: Tiến hành nhấn để chuyển đổi ao (led hiển thị ao tương ứng với mục (#)).
++ B3: Nhấn giữ nút khoảng 3 giây thì nhả tay ra để tiến hành xác nhận ao (led sẽ nháy 3 lần để xác nhận và chuyển đổi sang chọn chế độ đọc)
++ B4: Tiến hành nhấn để chuyển đổi chế độ đọc (led hiển thị chế độ tương ứng với mục (##)).
++ B5: Nhấn giữ nút khoảng 3 giây thì nhả tay ra để tiến hành xác nhận chế độ đọc (led sẽ nháy 3 lần để xác nhận và lưu cấu hình).
++ B6: Nếu thực hiện đúng thì led hiển thị ao đã chọn ở B2 (dưới dạng chớp tắt để báo hiệu đang hoạt động). Nếu không hiển thị đúng thì tiến hành cài đặt lại từ đầu.
+Lưu ý: ở B5 sẽ tiến hành xóa cấu hình cũ và ghi vào cấu hình mới. Còn ở những bước khác có thể hủy cấu hình bằng cách reset để chạy lại cấu hình cũ
+(#)
+STT 	Tên	      Led(LED1-LED2-LED3-LED4)
+1	    M1        Bật-Tắt-Tắt-Tắt   
+2	    M2        Tắt-Bật-Tắt-Tắt
+3	    M3        Bật-Bật-Tắt-Tắt
+4	    M4        Tắt-Tắt-Bật-Tắt
+5	    M5        Bật-Tắt-Bật-Tắt
+6	    M6        Tắt-Bật-Bật-Tắt
+7	    L1        Bật-Bật-Bật-Tắt
+8	    L2        Tắt-Tắt-Tắt-Bật
+9	    L3        Bật-Tắt-Tắt-Bật
+10	    G1        Tắt-Bật-Tắt-Bật
+11	    G2        Bật-Bật-Tắt-Bật
+12	    S4        Tắt-Tắt-Bật-Bật   
+
+(##)
+STT 	Tên	                Led(LED1-LED2-LED3-LED4)
+1       Read china          Bật-Tắt-Tắt-Tắt
+2       Read leadtec        Tắt-Bật-Tắt-Tắt
+3       Read leadtec DO     Bật-Bật-Tắt-Tắt
+
+index	name	config                                                                       Led(LED1-LED2-LED3-LED4)
+1	    M1	    2121232324242525-25FB512121423565-5908BCDEEC8FFE7455AF733B9BEE2B3D           Bật-Tắt-Tắt-Tắt   
+2	    M2	    13639E997E818890-70B3D57ED0065948-7F9F9211CEDBA46A364F7C25896144C4           Tắt-Bật-Tắt-Tắt
+3	    M3	    2054632152523553-70B3D57ED0065BFC-812A96B0F6C2AC50792E9F613AACD0EC           Bật-Bật-Tắt-Tắt
+4	    M4	    7678243287887878-70B3D57ED006AD86-C44248CF65264D68B04B1D5D65114679           Tắt-Tắt-Bật-Tắt
+5	    M5	    2323232425262728-2425242624252321-AA7D743C204EC178C5CEC2D462EE7734           Bật-Tắt-Bật-Tắt
+6	    M6	    378235990290F909-70B3D57ED006868C-C0A1AF7C9D9E7F020F32AA246D091726           Tắt-Bật-Bật-Tắt
+7	    L1	    2222223333334444-1223342553525155-6866389212FBF75567AC9AF58ABCD040           Bật-Bật-Bật-Tắt
+8	    L2	    238782E2849933E4-70B3D57ED0068AE4-4F75797E8CFD94E2B68044AAAA7F7D25           Tắt-Tắt-Tắt-Bật
+9	    G1	    78438477879E8980-70B3D57ED006AD79-FB84E9CD5EE2AD0C8C2BDBF5C72138F7           Bật-Tắt-Tắt-Bật
+10	    G2	    DE7DAFEF8EAFEFEE-70B3D57ED0068D98-2C137D7E8C2D00BA9EA7CFB49EE1230C           Tắt-Bật-Tắt-Bật
+11	    S4	    8FE9994900988288-70B3D57ED00694AA-7F5BA9D4F100EA53D291A1B3AED34BB0           Bật-Bật-Tắt-Bật
+
+index	name	   
+1       Read china  
+2       Read leadtec    
+3       Read leadtec DO      

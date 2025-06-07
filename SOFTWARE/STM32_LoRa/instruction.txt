@@ -1,0 +1,5 @@
+peripheral devices:
+- siêu âm sensor : đo mực thức ăn 
+- mực nước sensor : đo mực nước
+- dòng điện sensor : đo dòng
+- modbus rs485: pH, temperature, DO (optional) 

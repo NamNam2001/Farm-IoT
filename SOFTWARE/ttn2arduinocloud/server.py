@@ -24,7 +24,7 @@ data={}
 previous_data={}
 data_check = []
 warning_count = {}
-pH_warning_range = {}
+warning_range = {}
 
 DEVICE_ID = b"28d7800d-0c2d-4f38-afc5-748caee71d84"
 SECRET_KEY = b"!5IILjphe#Dha0FtnoF7T43lv"
@@ -45,8 +45,11 @@ def create_task(key):
             # esp_client[key] = float(data[key])#BUggggggggggggg
             if "warning" in key.split('_'):
                 # if data[key] != "":
-                esp_client[key] = data[key]
-                warning_count[key] = 0 
+                if "air" in key.split('_'):
+                    esp_client[key] = data[key]
+                else:
+                    esp_client[key] = data[key]
+                    warning_count[key] = 0 
             else:
                 esp_client[key] = float(data[key])#BUggggggggggggg
         else:
@@ -67,15 +70,27 @@ def create_callback_pH_warning(key_warning_target):
         print(key_warning_target,":",value)
         if "high" or "low" in key_warning_target:
             key_warning_range= key_warning_target.split("_")[0]+"_warning_range"
-            if key_warning_range not in pH_warning_range:
-                pH_warning_range[key_warning_range] = [None, None]
+            if key_warning_range not in warning_range:
+                warning_range[key_warning_range] = [None, None]
 
             if "high" in key_warning_target:
-                pH_warning_range[key_warning_range][0] = float(value)
+                warning_range[key_warning_range][0] = float(value)
             elif "low" in key_warning_target:
-                pH_warning_range[key_warning_range][1] = float(value)
+                warning_range[key_warning_range][1] = float(value)
     return on_pH_target_change
 
+def create_callback_current_warning(key_warning_target):
+    def on_current_target_change(client, value):
+        print(key_warning_target,":",value)
+        if "air_compressor_current" in key_warning_target:
+            key_warning_range= key_warning_target.split("_")[2]+"_warning_range"
+            if key_warning_range not in warning_range:
+                warning_range[key_warning_range] = [None, None]
+            if "high" in key_warning_target:
+                warning_range[key_warning_range][0] = float(value)
+            elif "low" in key_warning_target:
+                warning_range[key_warning_range][1] = float(value)
+    return on_current_target_change
 
 def arduino_cloud_thread():
     try:
@@ -95,17 +110,25 @@ def arduino_cloud_thread():
             if key == "m1_van1" or key == "motor_pump":
                 esp_client.register(Task(key, on_run=task_function, interval=1.0))
             elif "warning" in key.split('_'):
-                esp_client.register(Task(key, on_run=task_function, interval=600.0))
+                if "air" in  key.split('_'):
+                    esp_client.register(Task(key, on_run=task_function, interval=60.0))
+                else:
+                    esp_client.register(Task(key, on_run=task_function, interval=600.0))
             else:
                 esp_client.register(Task(key, on_run=task_function, interval=10.0))
             #PH warning
-            if "pH" in key and 'temp' not in key:
+            if ("pH" in key and 'temp' not in key) or "air_compressor_current" in key:
                 key_warning_range = [key + "_high", key + "_low"]
                 print(key_warning_range)
-                pH_warning_high= create_callback_pH_warning(key_warning_range[0])
-                pH_warning_low= create_callback_pH_warning(key_warning_range[1])
+                if "air_compressor_current" in key:
+                    pH_warning_high= create_callback_current_warning(key_warning_range[0])
+                    pH_warning_low= create_callback_current_warning(key_warning_range[1])
+                else:
+                    pH_warning_high= create_callback_pH_warning(key_warning_range[0])
+                    pH_warning_low= create_callback_pH_warning(key_warning_range[1])
                 esp_client.register(key_warning_range[0], value=None, on_write=pH_warning_high)
                 esp_client.register(key_warning_range[1], value=None, on_write=pH_warning_low)
+            
 
         esp_client.start()
     except KeyboardInterrupt:
@@ -176,15 +199,17 @@ def on_message(client, userdata, msg):
                # Check warning PH value
             for key in list(decoded_payload.keys()):
                 split_key = key.split('_')
+                key_warning = None
                 if "pH" in split_key and "temp" not in split_key:
                     key_warning = f"{split_key[0]}_warning"
+                elif "air_compressor_current" in key:
+                    key_warning = f"{split_key[0]}_{split_key[1]}_warning"
+                if key_warning is not None:
                     if key_warning not in data: 
-                    # if decoded_payload[key] > 8 or decoded_payload[key] < 7.7:
-
-                    # else:
                         decoded_payload[key_warning] = ""
                     else:
                         decoded_payload[key_warning] = data[key_warning]
+                    
 
         else: 
             decoded_payload = ""
@@ -352,13 +377,12 @@ async def check_pH_warning():
                     warning_count[key_warning] = 0
 
                 # condition
-                if key_warning_range in pH_warning_range:
-                    if data[payload] > pH_warning_range[key_warning_range][0] or data[payload] < pH_warning_range[key_warning_range][1]:
+                if key_warning_range in warning_range and all(value is not None for value in warning_range[key_warning_range]):
+                    if data[payload] > warning_range[key_warning_range][0] or data[payload] < warning_range[key_warning_range][1]:
                         warning_count[key_warning] += 1
                 else:  
                     if data[payload] > 8 or data[payload] < 7.7:
                         warning_count[key_warning] += 1  
-
 
                 # update value with times define
                 if warning_count[key_warning] >= 8:
@@ -368,10 +392,23 @@ async def check_pH_warning():
 
         # print("=======warning_count======")
         # print(warning_count)
-        # print("=======pH_warning_range======")
-        # print(pH_warning_range)
+        # print("=======warning_range======")
+        # print(warning_range)
         await asyncio.sleep(60)
 
+async def check_current_warning():
+    while True:
+        for payload in data:
+            if "air_compressor_current" in payload:
+                split_key = payload.split('_')
+                key_warning = f"{split_key[0]}_{split_key[1]}_warning"
+                key_warning_range = f"{split_key[2]}_warning_range"
+                if key_warning_range in warning_range and warning_range[key_warning_range][1] is not None:
+                    if data[payload] < warning_range[key_warning_range][1]:
+                        data[key_warning] = str(data[payload])
+                    else:
+                        data[key_warning] = ""
+        await asyncio.sleep(6)
 # Create MQTT Client instance
 def mqtt_thread():
     client = mqtt.Client()
@@ -394,7 +431,8 @@ def mqtt_thread():
     loop.run_until_complete(asyncio.gather(
         controlDevice('m1_van1', 'motor_pump', topic ,client),
         controlDevice('motor_pump', 'status_pump', topic1 ,client),
-        check_pH_warning()
+        check_pH_warning(),
+        check_current_warning()
     ))
 
     # Wait for a while to receive messages (you can add your own logic here)
